@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+
+    #PHP Service
+    sigga-app:
+        container_name: sigga-app
+        build: ./php
+        restart: unless-stopped
+        tty: true
+        working_dir: /var/www
+        volumes:
+            - /var/www:/var/www
+            - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        networks:
+            - sigga-network
+
+    #Nginx Service
+    sigga-server:
+        container_name: sigga-server
+        build: ./nginx
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - /var/www:/var/www
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - sigga-network
+
+    #MySQL Service
+    sigga-database:
+        container_name: sigga-database
+        build: ./mysql
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "3306:3306"
+        volumes:
+            - /var/www/db/mysql:/var/lib/mysql
+        environment:
+            - MYSQL_HOST=127.0.0.1
+            - MYSQL_PORT=3306
+            - MYSQL_DATABASE=${DEFAULT_DATABASE}
+            - MYSQL_USER=${DEFAULT_USER}
+            - MYSQL_PASSWORD=${DEFAULT_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${DEFAULT_ROOT_PASSWORD}
+        networks:
+            - sigga-network
+
+    #Redis Service
+    sigga-cache:
+        container_name: sigga-cache
+        build: ./redis
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        networks:
+            - sigga-network
+
+#Docker Networks
+networks:
+    sigga-network:
+        driver:
+            bridge
