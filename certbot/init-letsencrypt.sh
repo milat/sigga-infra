@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(sigga.milat.dev www.sigga.milat.dev)
+domains=(sigga.milat.dev)
 rsa_key_size=4096
 data_path="/var/www/sigga-infra/certbot"
 email="antonio@milat.dev" # Adding a valid address is strongly recommended
